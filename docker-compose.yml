@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: tweb
+      MYSQL_USER: tweb
+      MYSQL_PASSWORD: password
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    volumes:
+      - "./db:/docker-entrypoint-initdb.d"
+    ports:
+      - 3306:3306
+    networks:
+      - red-docker
+  www:
+    build:
+      context: ./ 
+    volumes:
+      - "./html:/var/www/html" 
+    ports:
+      - 80:80
+      - 443:443
+    links:
+      - db
+    networks:
+      - red-docker
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 8080:80
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+    networks:
+      - red-docker
+networks:
+  red-docker:
+    driver: bridge
